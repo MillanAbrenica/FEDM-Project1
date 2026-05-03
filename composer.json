@@ -1,0 +1,14 @@
+{
+  "name": "bat403/dataclean-pro",
+  "description": "DataClean Pro - Data Cleaning and Analytics System for BAT403",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "phpoffice/phpspreadsheet": "^2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "DataCleanPro\\": "includes/"
+    }
+  }
+}
