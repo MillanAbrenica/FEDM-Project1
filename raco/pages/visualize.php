@@ -34,30 +34,14 @@ if (!$dataset) {
 }
 
 $rows = raco_decode_dataset_rows_from_record($dataset);
-$headers = $rows ? array_keys($rows[0]) : [];
-$preview = array_slice($rows, 0, 20);
-
+$columns = $rows ? array_keys($rows[0]) : [];
 $numericCols = [];
-$typeMap = [];
-foreach ($headers as $h) {
-  $vals = array_values(array_filter(array_map(static fn($r) => $r[$h] ?? null, $rows), static fn($v) => $v !== null && $v !== ''));
-  $isNum = $vals && count(array_filter($vals, static fn($v) => is_numeric((string) $v))) >= max(1, (int) floor(count($vals) * 0.8));
-  $isDate = !$isNum && $vals && count(array_filter($vals, static fn($v) => strtotime((string) $v) !== false)) >= max(1, (int) floor(count($vals) * 0.8));
-  $typeMap[$h] = $isNum ? '123' : ($isDate ? '📅' : 'Abc');
-  if ($isNum) $numericCols[] = $h;
-}
 
-$outlierBounds = [];
-foreach ($numericCols as $h) {
-  $nums = array_map('floatval', array_filter(array_map(static fn($r) => $r[$h] ?? null, $rows), static fn($v) => is_numeric((string) $v)));
-  if (!$nums) continue;
-  $mean = array_sum($nums) / count($nums);
-  $var = 0;
-  foreach ($nums as $n) {
-    $var += ($n - $mean) * ($n - $mean);
+foreach ($columns as $col) {
+  $vals = array_filter(array_map(static fn($r) => $r[$col] ?? null, $rows), static fn($v) => $v !== null && $v !== '');
+  if ($vals && count(array_filter($vals, static fn($v) => is_numeric((string) $v))) >= max(1, (int) floor(count($vals) * 0.8))) {
+    $numericCols[] = $col;
   }
-  $std = sqrt($var / count($nums));
-  $outlierBounds[$h] = ['low' => $mean - 3 * $std, 'high' => $mean + 3 * $std];
 }
 
 $pageTitle = 'Visualize';
@@ -69,78 +53,88 @@ require __DIR__ . '/../includes/header.php';
   <main class="main-shell">
     <?php require __DIR__ . '/../includes/ribbon.php'; ?>
     <div class="page-wrap">
-      <h1 class="page-title">Visualization</h1>
-      <p class="page-subtitle">Build charts from cleaned dataset: <?php echo htmlspecialchars((string) $upload['original_filename']); ?></p>
+      <h1 class="page-title">Data Visualization</h1>
+      <p class="page-subtitle">Build interactive charts: <?php echo htmlspecialchars((string) $upload['original_filename']); ?></p>
 
-      <div class="grid-2">
-        <section class="card">
-          <h3>Chart Builder</h3>
-          <div class="form-grid" style="margin-top:10px;">
-            <div>
-              <label>Chart Type</label>
-              <select id="chartType">
-                <option value="bar">Bar</option>
-                <option value="line">Line</option>
-                <option value="pie">Pie</option>
-                <option value="scatter">Scatter</option>
-                <option value="histogram">Histogram</option>
-              </select>
+      <div class="viz-container">
+        <!-- LEFT SIDEBAR: Chart Palette -->
+        <aside class="viz-sidebar">
+          <div class="sidebar-title">Chart Types</div>
+          <div class="chart-palette">
+            <div class="palette-item" draggable="true" data-chart-type="bar">
+              <div class="palette-icon">📊</div>
+              <div class="palette-label">Bar</div>
             </div>
-            <div>
-              <label>X-axis</label>
-              <select id="xAxis"><?php foreach ($headers as $h): ?><option value="<?php echo htmlspecialchars($h); ?>"><?php echo htmlspecialchars($h); ?></option><?php endforeach; ?></select>
+            <div class="palette-item" draggable="true" data-chart-type="line">
+              <div class="palette-icon">📈</div>
+              <div class="palette-label">Line</div>
             </div>
-            <div>
-              <label>Y-axis</label>
-              <select id="yAxis"><?php foreach ($numericCols as $h): ?><option value="<?php echo htmlspecialchars($h); ?>"><?php echo htmlspecialchars($h); ?></option><?php endforeach; ?></select>
+            <div class="palette-item" draggable="true" data-chart-type="pie">
+              <div class="palette-icon">🥧</div>
+              <div class="palette-label">Pie</div>
             </div>
-            <div class="row" style="align-items:end;">
-              <button class="btn btn-primary" id="renderChartBtn" type="button">Render Chart</button>
-              <button class="btn" type="button" onclick="racoSaveChartPng()">Save as PNG</button>
+            <div class="palette-item" draggable="true" data-chart-type="scatter">
+              <div class="palette-icon">⚫</div>
+              <div class="palette-label">Scatter</div>
+            </div>
+            <div class="palette-item" draggable="true" data-chart-type="histogram">
+              <div class="palette-icon">📶</div>
+              <div class="palette-label">Histogram</div>
             </div>
           </div>
-          <div style="margin-top:12px;"><canvas id="mainChart" height="180"></canvas></div>
-          <div style="margin-top:12px;" class="row">
-            <a class="btn" href="../actions/export_handler.php?upload_id=<?php echo $uploadId; ?>&type=csv">Export CSV</a>
-            <a class="btn" href="../actions/export_handler.php?upload_id=<?php echo $uploadId; ?>&type=json">Export JSON</a>
-          </div>
-        </section>
+        </aside>
 
-        <section class="card">
-          <div class="panel-tabs">
-            <button class="active" type="button">Data</button>
-            <button type="button">Visualization</button>
-          </div>
-          <div class="stack" style="margin-top:10px;">
-            <div>
-              <div class="kpi"><?php echo htmlspecialchars((string) $upload['original_filename']); ?></div>
-              <div class="kpi-label">Data Source · <?php echo count($rows); ?> records</div>
+        <!-- CENTER: Canvas -->
+        <div class="viz-canvas-wrapper">
+          <div class="viz-canvas" id="vizCanvas">
+            <div class="canvas-placeholder">
+              <div class="placeholder-icon">📍</div>
+              <div class="placeholder-text">Drag a chart type here to get started</div>
             </div>
-            <div class="table-wrap">
-              <table data-interactive="1" id="vizTable">
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: Data & Visualization -->
+        <aside class="viz-right-panel">
+          <div class="panel-tabs" role="tablist">
+            <button class="tab-button active" role="tab" aria-selected="true" aria-controls="data-tab" data-tab="data">
+              Data
+            </button>
+            <button class="tab-button" role="tab" aria-selected="false" aria-controls="viz-tab" data-tab="visualization">
+              Visualization
+            </button>
+          </div>
+
+          <!-- Data Tab -->
+          <div class="tab-content active" id="data-tab" role="tabpanel">
+            <div class="data-summary">
+              <div class="data-summary-row">
+                <span class="summary-label">Dataset:</span>
+                <span class="summary-value"><?php echo htmlspecialchars((string) $upload['original_filename']); ?></span>
+              </div>
+              <div class="data-summary-row">
+                <span class="summary-label">Records:</span>
+                <span class="summary-value"><?php echo count($rows); ?></span>
+              </div>
+              <div class="data-summary-row">
+                <span class="summary-label">Columns:</span>
+                <span class="summary-value"><?php echo count($columns); ?></span>
+              </div>
+            </div>
+            <div class="data-table-wrapper">
+              <table class="data-table">
                 <thead>
                   <tr>
-                    <?php foreach ($headers as $h): ?>
-                      <th><?php echo htmlspecialchars($h); ?> <span class="text-muted"><?php echo htmlspecialchars($typeMap[$h]); ?></span></th>
+                    <?php foreach ($columns as $col): ?>
+                      <th><?php echo htmlspecialchars($col); ?></th>
                     <?php endforeach; ?>
                   </tr>
                 </thead>
                 <tbody>
-                  <?php foreach ($preview as $row): ?>
+                  <?php foreach (array_slice($rows, 0, 50) as $row): ?>
                     <tr>
-                      <?php foreach ($headers as $h):
-                        $raw = $row[$h] ?? null;
-                        $class = 'cell-clean';
-                        if ($raw === null || $raw === '') {
-                          $class = 'cell-empty';
-                        } elseif (isset($outlierBounds[$h]) && is_numeric((string) $raw)) {
-                          $v = (float) $raw;
-                          if ($v < $outlierBounds[$h]['low'] || $v > $outlierBounds[$h]['high']) {
-                            $class = 'cell-outlier';
-                          }
-                        }
-                      ?>
-                        <td class="<?php echo $class; ?>" data-editable="1" data-raw="<?php echo htmlspecialchars((string) $raw); ?>"><?php echo htmlspecialchars((string) $raw); ?></td>
+                      <?php foreach ($columns as $col): ?>
+                        <td><?php echo htmlspecialchars((string) ($row[$col] ?? '')); ?></td>
                       <?php endforeach; ?>
                     </tr>
                   <?php endforeach; ?>
@@ -148,43 +142,28 @@ require __DIR__ . '/../includes/header.php';
               </table>
             </div>
           </div>
-        </section>
+
+          <!-- Visualization Tab -->
+          <div class="tab-content" id="viz-tab" role="tabpanel">
+            <div id="vizSummary" class="viz-summary">
+              <div class="summary-empty">No charts created yet</div>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   </main>
 </div>
 
-<div id="findModal" class="find-modal">
-  <div class="inner">
-    <h3>Find & Replace</h3>
-    <div class="row"><input type="text" id="findValue" placeholder="Find value"></div>
-    <div class="row"><input type="text" id="replaceValue" placeholder="Replace with"></div>
-    <div class="row">
-      <button id="doReplace" class="btn btn-primary" type="button">Replace All</button>
-      <button id="closeFindModal" class="btn" type="button">Close</button>
-    </div>
-  </div>
-</div>
-
+<link rel="stylesheet" href="../assets/css/visualize.css">
 <script>
+  window.RACO_UPLOAD_ID = <?php echo (int) $uploadId; ?>;
+  window.RACO_COLUMNS = <?php echo json_encode($columns, JSON_UNESCAPED_UNICODE); ?>;
+  window.RACO_NUMERIC_COLS = <?php echo json_encode($numericCols, JSON_UNESCAPED_UNICODE); ?>;
   window.RACO_DATASET_ROWS = <?php echo json_encode($rows, JSON_UNESCAPED_UNICODE); ?>;
-  window.exportCurrent = function(type) {
-    window.location.href = '../actions/export_handler.php?upload_id=<?php echo $uploadId; ?>&type=' + encodeURIComponent(type);
-  };
-  document.getElementById('renderChartBtn').addEventListener('click', function() {
-    var type = document.getElementById('chartType').value;
-    var x = document.getElementById('xAxis').value;
-    var y = document.getElementById('yAxis').value;
-    racoRenderChart(window.RACO_DATASET_ROWS, type, x, y);
-  });
-  if (window.RACO_DATASET_ROWS.length) {
-    var y = document.getElementById('yAxis').value;
-    var x = document.getElementById('xAxis').value;
-    if (x && y) racoRenderChart(window.RACO_DATASET_ROWS, 'bar', x, y);
-  }
 </script>
-<script src="../assets/js/charts.js"></script>
-<script src="../assets/js/table.js"></script>
+<script src="../assets/js/visualize.js"></script>
+
 </body>
 
 </html>

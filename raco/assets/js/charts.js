@@ -78,6 +78,61 @@
     });
   };
 
+  // Create a chart instance into a specific canvas element and return the Chart instance.
+  window.racoCreateChart = function (canvasElem, rows, type, xKey, yKey) {
+    if (!canvasElem || !rows || !rows.length || !xKey || !yKey) return null;
+
+    var labels = [];
+    var values = [];
+    var realType = type;
+
+    if (type === 'histogram') {
+      var nums = rows.map(function (r) { return Number(r[yKey]); }).filter(function (v) { return !isNaN(v); });
+      var hist = histogram(nums, 10);
+      labels = hist.labels;
+      values = hist.values;
+      realType = 'bar';
+    } else if (type === 'scatter') {
+      labels = [];
+      values = rows.map(function (r) { return { x: Number(r[xKey]) || 0, y: Number(r[yKey]) || 0 }; });
+    } else if (type === 'pie') {
+      var pie = groupedData(rows, xKey, yKey);
+      labels = pie.labels;
+      values = pie.values;
+    } else {
+      var g = groupedData(rows, xKey, yKey);
+      labels = g.labels;
+      values = g.values;
+    }
+
+    try {
+      var ctx = (canvasElem.getContext) ? canvasElem.getContext('2d') : canvasElem;
+      return new Chart(ctx, {
+        type: realType,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: yKey,
+            data: values,
+            backgroundColor: ['#4f6ef7', '#2e7d32', '#f39c12', '#8e44ad', '#e74c3c', '#1abc9c', '#2980b9'],
+            borderColor: '#3f5ce6',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: 8 },
+          plugins: { legend: { display: true } },
+          scales: realType === 'pie' ? undefined : { y: { beginAtZero: true } }
+        }
+      });
+    } catch (e) {
+      console.error('racoCreateChart error', e);
+      return null;
+    }
+  };
+
   window.racoSaveChartPng = function () {
     var canvas = document.getElementById('mainChart');
     if (!canvas) return;
