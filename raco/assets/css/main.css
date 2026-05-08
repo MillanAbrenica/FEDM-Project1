@@ -1,0 +1,251 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --navy: #1a1f3a;
+  --blue: #4f6ef7;
+  --blue-dark: #3d5de3;
+  --bg: #f3f4f8;
+  --line: #e4e7f0;
+  --text: #1e2442;
+  --muted: #6a708a;
+  --good: #e8f7ec;
+  --warn: #fff6db;
+  --bad: #ffe8e8;
+}
+body {
+  font-family:
+    Segoe UI,
+    Arial,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-width: 1280px;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.app-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+.main-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+.page-wrap {
+  padding: 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.page-subtitle {
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.quick-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+.quick-card .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  color: var(--blue);
+  background: #ebefff;
+}
+.quick-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.quick-card p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.btn-primary:hover {
+  background: var(--blue-dark);
+}
+.btn-danger {
+  background: #d34f4f;
+  color: #fff;
+  border-color: #d34f4f;
+}
+.kpi {
+  font-size: 22px;
+  font-weight: 700;
+}
+.kpi-label {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.stack {
+  display: grid;
+  gap: 10px;
+}
+.mt-16 {
+  margin-top: 16px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.badge.uploaded {
+  background: #e8efff;
+  color: #3052d8;
+}
+.badge.profiled {
+  background: #e6f7ff;
+  color: #0f7aac;
+}
+.badge.cleaned {
+  background: #e9f8ec;
+  color: #247e35;
+}
+.badge.analyzed {
+  background: #f3ecff;
+  color: #6a35c7;
+}
+.upload-zone {
+  border: 2px dashed #b9c2dd;
+  border-radius: 12px;
+  background: #fff;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.upload-zone.drag {
+  border-color: var(--blue);
+  background: #f5f7ff;
+}
+.upload-zone .big {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.upload-zone .small {
+  color: var(--muted);
+}
+.progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #eef1f8;
+  overflow: hidden;
+  margin-top: 12px;
+}
+.progress > div {
+  height: 100%;
+  width: 0;
+  background: var(--blue);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+label {
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+}
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+}
+.panel-tabs button {
+  border: none;
+  background: transparent;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted);
+}
+.panel-tabs button.active {
+  color: var(--blue);
+  border-bottom: 2px solid var(--blue);
+}
+.text-muted {
+  color: var(--muted);
+}
+.alert {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.alert.error {
+  background: #ffecec;
+  color: #a92f2f;
+}
+.alert.success {
+  background: #eaf8ef;
+  color: #247e35;
+}

@@ -1,0 +1,36 @@
+product_id,product_name,category,price
+1,Laptop,Electronics,39267.0
+2,Gaming Laptop,Electronics,118485.0
+3,Smartphone,Electronics,10832.0
+4,Wireless Mouse,Electronics,893.0
+5,Mechanical Keyboard,Electronics,5941.0
+6,LED Monitor,Electronics,
+7,Bluetooth Speaker,Electronics,3863.0
+8,USB Flash Drive,Electronics,571.0
+9,Power Bank,Electronics,517.0
+10,Tablet,Electronics,7643.0
+11,T-Shirt,Clothing,798.0
+12,Jeans,Clothing,1776.0
+13,Jacket,Clothing,3259.0
+14,Sneakers,Clothing,5850.0
+15,Hoodie,Clothing,1544.0
+16,Cap,Clothing,208.0
+17,Rice Cooker,Home Appliances,3280.0
+18,Electric Fan,Home Appliances,1064.0
+19,Blender,Home Appliances,1961.0
+20,Microwave Oven,Home Appliances,4061.0
+21,Vacuum Cleaner,Home Appliances,7874.0
+22,Basketball,Sports,539.0
+23,Football,Sports,1091.0
+24,Badminton Racket,Sports,1663.0
+25,Yoga Mat,Sports,1226.0
+26,Dumbbell Set,Sports,2482.0
+27,Instant Noodles Pack,Food,200.0
+28,Chocolate Bar,Food,112.0
+29,Potato Chips,Food,123.0
+30,Bottled Water,Food,38.0
+31,Soft Drinks 1.5L,Food,108.0
+32,Coffee Pack,Food,130.0
+33,Milk 1L,Food,159.0
+16,Cap,Clothing,208.0
+9,Power Bank,Electronics,517.0

@@ -1,0 +1,64 @@
+.ribbon {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 4px 6px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.ribbon-group {
+  min-width: 0;
+  border-right: 1px solid var(--line);
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.ribbon-group:last-child {
+  border-right: none;
+}
+.ribbon-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ribbon-actions {
+  display: flex;
+  gap: 2px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.ribbon-btn {
+  border: 1px solid transparent;
+  background: #fff;
+  padding: 3px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #4f556f;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-width: 28px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ribbon-btn i {
+  font-size: 13px;
+  margin: 0;
+}
+.ribbon-btn span {
+  display: none;
+}
+.ribbon-btn:hover {
+  border-color: var(--line);
+  background: #f8f9fc;
+}
+.ribbon-btn:hover span {
+  display: inline-block;
+}
