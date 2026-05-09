@@ -6,6 +6,7 @@
       <a href="../pages/projects.php" class="ribbon-btn"><i class="fa-solid fa-folder-open"></i><span>Open</span></a>
       <button type="button" class="ribbon-btn" onclick="window.print()"><i class="fa-solid fa-floppy-disk"></i><span>Save</span></button>
       <a href="../pages/projects.php" class="ribbon-btn"><i class="fa-solid fa-copy"></i><span>Save As</span></a>
+      <button type="button" class="ribbon-btn" onclick="window.toggleSidebar && window.toggleSidebar()"><i class="fa-solid fa-bars"></i><span>Sidebar</span></button>
     </div>
   </div>
 
